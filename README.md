@@ -1,7 +1,8 @@
 # 🛡️ Resilient Sourcing & Risk Optimizer
 **Optimization-as-a-Service (OaaS) for Global Procurement**
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_svg)](https://resilient-sourcing-risk-optimizer-fxn6g63uy8o6btxf4hhmgj.streamlit.app/)
+# 🔽 link to streamlit live app
+[![https://streamlit.io/brand](https://static.streamlit.io/badges/streamlit_badge_svg)](https://resilient-sourcing-risk-optimizer-fxn6g63uy8o6btxf4hhmgj.streamlit.app/)
 
 ## 📌 Project Overview
 In a world of volatile supply chains, picking the "cheapest" supplier is no longer enough. This Decision Support System (DSS) helps procurement managers balance **Cost**, **Operational Efficiency**, and **Risk Resilience**.
