@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.figure_factory as ff
+import plotly.express as px  # Updated for better stability
+import plotly.graph_objects as go
 from engine import generate_data
 from analysis import DEASolver, calculate_ahp_weights, AllocationSolver, SimulationEngine
 
@@ -13,6 +14,7 @@ st.set_page_config(
 )
 
 # --- DATA INITIALIZATION ---
+# Session state ensures data doesn't reset when you move the slider
 if 'df' not in st.session_state:
     st.session_state.df = generate_data()
 df = st.session_state.df
@@ -35,9 +37,13 @@ cost_vs_time = st.sidebar.slider(
     help="Move left to save money. Move right for speed/reliability."
 )
 
-# Calculate weights from the slider
-matrix = [[1, cost_vs_time], [1/cost_vs_time, 1]]
-weights, cr = calculate_ahp_weights(matrix)
+# Calculate weights from the slider (AHP)
+try:
+    matrix = [[1, cost_vs_time], [1/cost_vs_time, 1]]
+    weights, cr = calculate_ahp_weights(matrix)
+except Exception as e:
+    st.error(f"AHP Calculation Error: {e}")
+    weights = [0.5, 0.5]
 
 # Visualizing the Weights in the Sidebar
 st.sidebar.write("### 🎯 Current Strategy")
@@ -62,19 +68,16 @@ with tab1:
     solver = DEASolver(df, inputs=['Unit_Cost', 'Lead_Time'], outputs=['Reliability'])
     df['Efficiency_Score'] = solver.get_all_scores()
     
-    # 2. CALCULATE STRATEGIC SCORE (Based on Sidebar Slider)
-    # Normalize values so 1.0 is 'Best' and 0.0 is 'Worst'
+    # 2. CALCULATE STRATEGIC FIT
     c_min, c_max = df['Unit_Cost'].min(), df['Unit_Cost'].max()
     t_min, t_max = df['Lead_Time'].min(), df['Lead_Time'].max()
     norm_cost = 1 - (df['Unit_Cost'] - c_min) / (c_max - c_min)
     norm_time = 1 - (df['Lead_Time'] - t_min) / (t_max - t_min)
-    
     df['Strategic_Fit'] = (norm_cost * weights[0]) + (norm_time * weights[1])
     
     st.write("### Comparison Table")
-    st.info("💡 **Efficiency** is the supplier's overall performance. **Strategic Fit** changes based on your slider settings.")
+    st.info("💡 **Efficiency** is the objective math score. **Strategic Fit** changes as you move the sidebar slider.")
     
-    # Display styled dataframe with both metrics
     st.dataframe(
         df[['Supplier', 'Unit_Cost', 'Lead_Time', 'Reliability', 'Efficiency_Score', 'Strategic_Fit']]
         .sort_values('Strategic_Fit', ascending=False)
@@ -86,13 +89,13 @@ with tab1:
 
 with tab2:
     st.header("Step 2: Optimal Purchase Plan")
-    st.markdown("We use the **Efficiency Score** as the primary driver to ensure you buy from the best overall suppliers.")
+    st.markdown("We use the **Efficiency Score** as the driver to ensure you buy from the best overall performers.")
     
     eff_importance = st.select_slider(
         "Optimization Strategy:",
         options=[0, 25, 50, 75, 100],
         value=50,
-        help="Higher values focus more on top-performing (Efficient) suppliers than just price."
+        help="Higher values focus more on efficient suppliers than just raw price."
     )
     
     if st.button("🚀 Find the Best Order Split"):
@@ -124,7 +127,7 @@ with tab2:
 with tab3:
     st.header("Step 3: Risk Stress Test")
     if 'optimized' not in st.session_state:
-        st.warning("⚠️ Please run Step 2 first.")
+        st.warning("⚠️ Please run Step 2 first to create a plan.")
     else:
         if st.button("🎲 Run 1,000 Crisis Scenarios"):
             sim_engine = SimulationEngine(df, st.session_state.allocations)
@@ -138,8 +141,16 @@ with tab3:
             else:
                 st.success(f"✅ **Safe!** Only {risk:.1f}% chance of supply failure.")
             
-            fig = ff.create_distplot([sim_results], ['Total Units Delivered'], bin_size=50, show_rug=False)
-            fig.add_vline(x=total_demand, line_dash="dash", line_color="red", annotation_text="Your Requirement")
+            # Updated Histogram using Plotly Express for better stability
+            fig = px.histogram(
+                x=sim_results, 
+                nbins=30,
+                labels={'x': 'Total Units Delivered'},
+                title="Distribution of Possible Outcomes",
+                color_discrete_sequence=['#636EFA']
+            )
+            fig.add_vline(x=total_demand, line_dash="dash", line_color="red", 
+                          annotation_text="Your Requirement", annotation_position="top left")
             st.plotly_chart(fig, use_container_width=True)
 
 # --- FOOTER ---
