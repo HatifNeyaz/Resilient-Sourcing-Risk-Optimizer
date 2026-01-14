@@ -1,6 +1,6 @@
 streamlit
 pandas
 numpy
+plotly
 pulp
-plotly = 6.3.0
 scipy
