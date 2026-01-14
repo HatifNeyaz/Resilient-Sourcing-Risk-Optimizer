@@ -35,12 +35,12 @@ graph TD
     H --> I
 
     %% Professional Styling
-    style A font-weight:bold,color:#000,font-size:16px
+    style A font-weight:bold,color:#fff,font-size:16px
     style B fill:#f9f,stroke:#333,stroke-width:2px,font-weight:bold,color:#000,font-size:16px
-    style C font-weight:bold,color:#000,font-size:16px
-    style D font-weight:bold,color:#000,font-size:16px
+    style C font-weight:bold,color:#fff,font-size:16px
+    style D font-weight:bold,color:#fff,font-size:16px
     style E fill:#bbf,stroke:#333,stroke-width:2px,font-weight:bold,color:#000,font-size:16px
-    style F font-weight:bold,color:#000,font-size:16px
+    style F font-weight:bold,color:#fff,font-size:16px
     style G fill:#dfd,stroke:#333,stroke-width:2px,font-weight:bold,color:#000,font-size:16px
-    style H font-weight:bold,color:#000,font-size:16px
-    style I font-weight:bold,color:#000,font-size:16px
+    style H font-weight:bold,color:#fff,font-size:16px
+    style I font-weight:bold,color:#fff,font-size:16px
