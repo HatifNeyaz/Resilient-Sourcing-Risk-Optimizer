@@ -11,6 +11,7 @@ The application uses a tri-phase mathematical approach to move from raw supplier
 ## 🏗️ System Architecture
 The following diagram illustrates the decision-making pipeline implemented in this tool:
 
+```mermaid
 graph TD
     %% Node Definitions
     A[Raw Supplier Data]
